@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Living Technology: Tools Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Cyberpunk / Holographic Theme */
+        :root {
+            --primary-glow: #00e5ff;
+            --secondary-glow: #ff00ea;
+            --bg-color: #050510;
+            --panel-bg: rgba(10, 15, 30, 0.75);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+            min-height: 100vh;
+            perspective: 1000px;
+        }
+
+        /* --- Floating & Moving Background Designs --- */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #111122 0%, var(--bg-color) 100%);
+        }
+
+        .shape {
+            position: absolute;
+            border: 2px solid rgba(0, 229, 255, 0.15);
+            border-radius: 50%;
+            animation: float-shape 20s infinite linear;
+        }
+
+        .shape-1 { width: 300px; height: 300px; top: -50px; left: -100px; border-style: dashed; animation-duration: 25s; }
+        .shape-2 { width: 500px; height: 500px; bottom: -150px; right: -100px; border-color: rgba(255, 0, 234, 0.1); animation-direction: reverse; }
+        .shape-3 { width: 150px; height: 150px; top: 40%; left: 80%; border-radius: 10px; transform: rotate(45deg); animation: float-cube 15s infinite ease-in-out; border-color: rgba(0, 229, 255, 0.2); }
+        .shape-4 { width: 200px; height: 200px; top: 20%; left: 10%; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; border-color: rgba(255, 0, 234, 0.15); animation: morph-shape 15s infinite ease-in-out; }
+
+        @keyframes float-shape {
+            0% { transform: rotate(0deg) translate(0, 0); }
+            50% { transform: rotate(180deg) translate(30px, 30px); }
+            100% { transform: rotate(360deg) translate(0, 0); }
+        }
+        @keyframes float-cube {
+            0%, 100% { transform: rotate(45deg) translateY(0); }
+            50% { transform: rotate(90deg) translateY(-40px); }
+        }
+        @keyframes morph-shape {
+            0%, 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; transform: translateY(0) rotate(0deg); }
+            50% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; transform: translateY(-30px) rotate(45deg); }
+        }
+
+        /* --- New Floating Tools Background (Quiz) --- */
+        #floating-tools {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+            transition: opacity 1s ease;
+        }
+        .float-tool {
+            position: absolute;
+            color: var(--primary-glow);
+            opacity: 0.12;
+            animation: floatUp linear infinite;
+        }
+        .float-tool:nth-child(even) { color: var(--secondary-glow); }
+        
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) rotate(0deg); }
+            100% { transform: translateY(-20vh) rotate(360deg); }
+        }
+
+        /* --- Login Form Scanner --- */
+        .login-scanner {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-glow);
+            box-shadow: 0 0 15px var(--primary-glow), 0 0 30px var(--primary-glow);
+            left: 0;
+            animation: scan-login 3.5s ease-in-out infinite alternate;
+            z-index: 20;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        @keyframes scan-login {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        /* --- UI Containers & Animations --- */
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.15), inset 0 0 20px rgba(0, 229, 255, 0.1);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            animation: float-panel 6s ease-in-out infinite;
+        }
+
+        @keyframes float-panel {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Glowing Texts */
+        .text-glow { text-shadow: 0 0 10px var(--primary-glow), 0 0 20px var(--primary-glow); color: #e0ffff; }
+        .text-glow-alt { text-shadow: 0 0 10px var(--secondary-glow), 0 0 20px var(--secondary-glow); color: #f3e8ff; }
+
+        /* Inputs & Buttons */
+        .input-group { position: relative; margin-bottom: 1.5rem; z-index: 30; }
+        .input-glowing {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        .input-glowing:focus {
+            outline: none;
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.4), inset 0 0 10px rgba(0, 229, 255, 0.2);
+            transform: scale(1.02);
+        }
+
+        .btn-glowing {
+            background: linear-gradient(90deg, rgba(0,229,255,0.1), rgba(255,0,234,0.1));
+            border: 2px solid var(--primary-glow);
+            color: var(--primary-glow);
+            text-shadow: 0 0 8px var(--primary-glow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 1;
+        }
+        .btn-glowing:hover {
+            background: var(--primary-glow);
+            color: #000;
+            box-shadow: 0 0 30px var(--primary-glow);
+            transform: translateY(-2px);
+            letter-spacing: 2px;
+        }
+
+        .choice-btn {
+            background: rgba(15, 25, 45, 0.9);
+            border: 2px solid rgba(0, 229, 255, 0.3);
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .choice-btn:hover {
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+            transform: translateY(-3px) scale(1.02);
+            background: rgba(0, 229, 255, 0.1);
+        }
+
+        /* Image Display */
+        .tool-image-container {
+            position: relative;
+            padding: 10px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            border: 1px dashed rgba(255, 0, 234, 0.4);
+            margin: 0 auto 20px auto;
+            max-width: 450px;
+            overflow: hidden; /* Added to keep corners clean */
+        }
+        .tool-image {
+            width: 100%;
+            height: 250px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #000;
+        }
+        .corner-bracket {
+            position: absolute; width: 20px; height: 20px; border-color: var(--primary-glow); border-style: solid;
+        }
+        .tl { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
+        .tr { top: -2px; right: -2px; border-width: 2px 2px 0 0; }
+        .bl { bottom: -2px; left: -2px; border-width: 0 0 2px 2px; }
+        .br { bottom: -2px; right: -2px; border-width: 0 2px 2px 0; }
+
+        .hidden-section { display: none !important; opacity: 0; }
+        .fade-in { animation: fadeIn 0.5s forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <!-- Moving Background Designs -->
+    <div class="bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+    </div>
+
+    <!-- Floating Tools Background (Only visible during quiz) -->
+    <div id="floating-tools" style="opacity: 0;">
+        <i class="fa-solid fa-hammer float-tool" style="left: 10%; font-size: 3.5rem; animation-duration: 20s; animation-delay: 0s;"></i>
+        <i class="fa-solid fa-wrench float-tool" style="left: 25%; font-size: 2.5rem; animation-duration: 25s; animation-delay: -5s;"></i>
+        <i class="fa-solid fa-gear float-tool" style="left: 45%; font-size: 4.5rem; animation-duration: 18s; animation-delay: -2s;"></i>
+        <i class="fa-solid fa-screwdriver float-tool" style="left: 65%; font-size: 3rem; animation-duration: 22s; animation-delay: -10s;"></i>
+        <i class="fa-solid fa-toolbox float-tool" style="left: 85%; font-size: 4rem; animation-duration: 28s; animation-delay: -3s;"></i>
+        <i class="fa-solid fa-hammer float-tool" style="left: 75%; font-size: 2rem; animation-duration: 24s; animation-delay: -15s;"></i>
+        <i class="fa-solid fa-wrench float-tool" style="left: 15%; font-size: 3rem; animation-duration: 19s; animation-delay: -8s;"></i>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div class="w-full max-w-4xl glass-panel p-6 md:p-10 fade-in" id="main-container">
+        
+        <!-- ================= LOGIN SECTION ================= -->
+        <div id="login-section">
+            <div class="text-center mb-8">
+                <div class="inline-block p-3 rounded-full bg-cyan-900 bg-opacity-30 border border-cyan-500 mb-4 animate-pulse">
+                    <svg class="w-10 h-10 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                </div>
+                <h1 class="text-3xl md:text-5xl font-black text-glow mb-2 uppercase tracking-widest">Living Technology</h1>
+                <h2 class="text-xl md:text-2xl text-glow-alt tracking-wide font-bold">Hand & Power Tools Quiz</h2>
+            </div>
+
+            <form id="login-form" class="max-w-md mx-auto relative z-10 bg-black bg-opacity-40 p-6 rounded-xl border border-gray-800 shadow-2xl overflow-hidden">
+                <!-- Login Scanner Animation is HERE now -->
+                <div class="login-scanner"></div>
+                
+                <div class="input-group">
+                    <label class="block text-xs font-bold mb-1 text-cyan-400 uppercase tracking-wider">Section (班級)</label>
+                    <select id="student-section" required class="w-full p-3 rounded-lg input-glowing relative z-30">
+                        <option value="" disabled selected>Select your section...</option>
+                        <option value="701">Class 701</option>
+                        <option value="702">Class 702</option>
+                        <option value="703">Class 703</option>
+                        <option value="704">Class 704</option>
+                        <option value="705">Class 705</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label class="block text-xs font-bold mb-1 text-cyan-400 uppercase tracking-wider">Seat Number (座號)</label>
+                    <input type="number" id="student-seat" min="1" max="50" required placeholder="01 - 50" class="w-full p-3 rounded-lg input-glowing relative z-30">
+                </div>
+                <div class="input-group">
+                    <label class="block text-xs font-bold mb-1 text-cyan-400 uppercase tracking-wider">Chinese Name (中文姓名)</label>
+                    <input type="text" id="student-cname" required placeholder="Enter Name" class="w-full p-3 rounded-lg input-glowing relative z-30">
+                </div>
+                <div class="input-group">
+                    <label class="block text-xs font-bold mb-1 text-cyan-400 uppercase tracking-wider">English Name (英文姓名)</label>
+                    <input type="text" id="student-ename" required placeholder="Enter Name" class="w-full p-3 rounded-lg input-glowing relative z-30">
+                </div>
+                
+                <div class="pt-4 text-center relative z-30">
+                    <div class="flex items-center justify-center gap-2 mb-4 text-yellow-400 text-sm font-semibold">
+                        <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Time Limit: 10 Minutes
+                    </div>
+                    <button type="submit" class="w-full py-4 text-xl font-bold rounded-lg btn-glowing uppercase tracking-widest">
+                        Start Quiz
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ================= QUIZ SECTION ================= -->
+        <div id="quiz-section" class="hidden-section">
+            <div class="flex justify-between items-center border-b border-cyan-800 pb-4 mb-6">
+                <!-- Player Info -->
+                <div class="text-sm md:text-base bg-black bg-opacity-50 px-4 py-2 rounded-lg border border-cyan-900">
+                    <span class="text-cyan-400 font-bold">Student:</span> <span id="display-name" class="font-bold">---</span> 
+                    <span class="text-gray-400 ml-2">|<span id="display-section" class="ml-2">---</span> - <span id="display-seat">---</span></span>
+                </div>
+                <!-- Timer -->
+                <div class="text-2xl font-mono font-bold text-glow bg-black bg-opacity-50 px-4 py-2 rounded-lg border border-cyan-900" id="timer-display">
+                    10:00
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-900 rounded-full h-3 mb-2 border border-slate-700 relative overflow-hidden">
+                <div id="progress-bar" class="bg-gradient-to-r from-cyan-600 to-cyan-300 h-full rounded-full transition-all duration-500" style="width: 0%; box-shadow: 0 0 15px cyan;"></div>
+            </div>
+            <div class="text-right mb-6 text-cyan-400 font-bold text-sm tracking-widest uppercase">
+                Question <span id="current-question-num">1</span> / 16
+            </div>
+
+            <!-- Question Text -->
+            <h3 class="text-2xl md:text-3xl text-center mb-6 font-bold text-glow-alt">
+                Identify this tool/machine:
+            </h3>
+
+            <!-- Image Area with Futuristic Frame (Scanner removed) -->
+            <div class="tool-image-container">
+                <div class="corner-bracket tl"></div>
+                <div class="corner-bracket tr"></div>
+                <div class="corner-bracket bl"></div>
+                <div class="corner-bracket br"></div>
+                <!-- IMPORTANT: Replace src with actual image paths in GitHub later -->
+                <img id="question-image" src="" alt="Tool Image" class="tool-image" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMjUwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMWExYTFhIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMGU1ZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIj5JbWFnZSBQbGFjZWhvbGRlcjwvdGV4dD48L3N2Zz4=';">
+            </div>
+
+            <!-- Multiple Choices (Now a 2x2 Grid for 4 Options) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto" id="choices-container">
+                <button class="w-full text-left p-4 rounded-xl choice-btn text-lg font-semibold flex items-center gap-4" onclick="selectAnswer(0)" id="choice-0">
+                    <span class="bg-cyan-900 text-cyan-300 w-8 h-8 flex items-center justify-center rounded-full text-sm shrink-0">A</span> <span id="choice-text-0">Option 1</span>
+                </button>
+                <button class="w-full text-left p-4 rounded-xl choice-btn text-lg font-semibold flex items-center gap-4" onclick="selectAnswer(1)" id="choice-1">
+                    <span class="bg-cyan-900 text-cyan-300 w-8 h-8 flex items-center justify-center rounded-full text-sm shrink-0">B</span> <span id="choice-text-1">Option 2</span>
+                </button>
+                <button class="w-full text-left p-4 rounded-xl choice-btn text-lg font-semibold flex items-center gap-4" onclick="selectAnswer(2)" id="choice-2">
+                    <span class="bg-cyan-900 text-cyan-300 w-8 h-8 flex items-center justify-center rounded-full text-sm shrink-0">C</span> <span id="choice-text-2">Option 3</span>
+                </button>
+                <button class="w-full text-left p-4 rounded-xl choice-btn text-lg font-semibold flex items-center gap-4" onclick="selectAnswer(3)" id="choice-3">
+                    <span class="bg-cyan-900 text-cyan-300 w-8 h-8 flex items-center justify-center rounded-full text-sm shrink-0">D</span> <span id="choice-text-3">Option 4</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= RESULT / LEADERBOARD SECTION ================= -->
+        <div id="result-section" class="hidden-section">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl md:text-5xl font-black text-glow-alt mb-6 uppercase">Quiz Complete</h2>
+                <div class="inline-block bg-black bg-opacity-60 p-8 rounded-3xl border-2 border-cyan-500 shadow-[0_0_40px_rgba(0,229,255,0.3)] relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-full opacity-10" style="background: repeating-linear-gradient(45deg, transparent, transparent 10px, #00e5ff 10px, #00e5ff 20px);"></div>
+                    
+                    <p class="text-xl text-cyan-300 mb-2 relative z-10 font-bold uppercase tracking-widest">Final Score</p>
+                    <p class="text-7xl font-black text-glow relative z-10 my-4" id="final-score">0/16</p>
+                    <p class="text-gray-300 relative z-10 font-mono text-lg" id="completion-time">Time Used: --:--</p>
+                </div>
+            </div>
+
+            <div class="max-w-3xl mx-auto bg-black bg-opacity-40 rounded-xl border border-gray-800 p-4 md:p-8">
+                <h3 class="text-2xl font-bold text-center mb-6 text-glow flex items-center justify-center gap-3">
+                    <svg class="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                    Live Leaderboard
+                </h3>
+                
+                <div class="overflow-x-auto rounded-lg border border-slate-700">
+                    <table class="w-full text-left border-collapse bg-slate-900 bg-opacity-50">
+                        <thead>
+                            <tr class="bg-slate-800 text-cyan-400 border-b border-cyan-800">
+                                <th class="p-4 font-bold uppercase tracking-wider text-sm">Rank</th>
+                                <th class="p-4 font-bold uppercase tracking-wider text-sm">Class</th>
+                                <th class="p-4 font-bold uppercase tracking-wider text-sm">No.</th>
+                                <th class="p-4 font-bold uppercase tracking-wider text-sm">Name</th>
+                                <th class="p-4 font-bold uppercase tracking-wider text-sm text-right">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body" class="divide-y divide-slate-800">
+                            <tr><td colspan="5" class="text-center p-4 text-gray-400">Loading scores...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-10 text-center">
+                    <button onclick="location.reload()" class="px-10 py-4 rounded-xl btn-glowing font-bold uppercase tracking-widest text-lg">
+                        Restart / Next Student
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs for Live Leaderboard & Data Storage -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        /* =========================================
+           1. QUIZ DATA & QUESTIONS (4 Options)
+           ========================================= */
+        const quizQuestions = [
+            { image: "./images/3D_Printer.png", correctTool: "3D Printer", options: ["Air Compressor", "3D Printer", "Lathe", "Drilling Machine"] },
+            { image: "./images/Air_compressor.png", correctTool: "Air Compressor", options: ["Air Compressor", "Drilling Machine", "Band Saw", "Belt Sander"] },
+            { image: "./images/Band_Saw.png", correctTool: "Band Saw", options: ["Scroll Saw Machine", "Coping Saw", "Band Saw", "Folding Saw"] },
+            { image: "./images/Belt_Sander.png", correctTool: "Belt Sander", options: ["Belt Sander", "Hand Drill", "Lathe", "Scroll Saw Machine"] },
+            { image: "./images/Coping_saw.png", correctTool: "Coping Saw", options: ["Folding Saw", "Coping Saw", "Hammers", "Band Saw"] },
+            { image: "./images/Drilling_Machine.png", correctTool: "Drilling Machine", options: ["Drilling Machine", "Lathe", "Air Compressor", "3D Printer"] },
+            { image: "./images/Folding_saw.png", correctTool: "Folding Saw", options: ["Coping Saw", "Pliers", "Folding Saw", "Band Saw"] },
+            { image: "./images/Hammers.png", correctTool: "Hammers", options: ["Screwdrivers", "Hammers", "Wrenches", "Pliers"] },
+            { image: "./images/Hand_and_Portable_Power_Tools.png", correctTool: "Hand and Portable Power Tools", options: ["Hand and Portable Power Tools", "Rulers", "Pliers", "Hammers"] },
+            { image: "./images/Hand_drill.png", correctTool: "Hand Drill", options: ["Screwdrivers", "Hand Drill", "Belt Sander", "Drilling Machine"] },
+            { image: "./images/Lathe.png", correctTool: "Lathe", options: ["Lathe", "Band Saw", "3D Printer", "Drilling Machine"] },
+            { image: "./images/Pliers.png", correctTool: "Pliers", options: ["Wrenches", "Pliers", "Hammers", "Screwdrivers"] },
+            { image: "./images/Rulers.png", correctTool: "Rulers", options: ["Rulers", "Hand Drill", "Screwdrivers", "Wrenches"] },
+            { image: "./images/Screwdrivers.png", correctTool: "Screwdrivers", options: ["Pliers", "Screwdrivers", "Wrenches", "Hammers"] },
+            { image: "./images/Scroll_Saw_Machine.png", correctTool: "Scroll Saw Machine", options: ["Band Saw", "Coping Saw", "Scroll Saw Machine", "Lathe"] },
+            { image: "./images/Wrenches.png", correctTool: "Wrenches", options: ["Wrenches", "Pliers", "Hammers", "Screwdrivers"] }
+        ];
+
+        /* =========================================
+           2. STATE VARIABLES
+           ========================================= */
+        window.quizState = {
+            currentUser: {},
+            currentQuestionIndex: 0,
+            score: 0,
+            timeRemaining: 600,
+            timerInterval: null,
+            shuffledQuestions: []
+        };
+        
+        let db, auth, globalAppId;
+        let globalLeaderboardData = []; // Store fetched database scores
+
+        /* =========================================
+           3. FIREBASE SETUP (For Database Storage)
+           ========================================= */
+        const initFirebase = async () => {
+            try {
+                if (typeof __firebase_config !== 'undefined' && typeof __app_id !== 'undefined') {
+                    const firebaseConfig = JSON.parse(__firebase_config);
+                    const app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+                    globalAppId = __app_id;
+
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) setupLeaderboardListener();
+                    });
+                } else {
+                    console.warn("Firebase config not found. Running in local mode without cloud saves.");
+                    setupMockLeaderboard();
+                }
+            } catch(e) {
+                console.error("Firebase init error:", e);
+                setupMockLeaderboard();
+            }
+        };
+
+        const setupLeaderboardListener = () => {
+            const leaderboardRef = collection(db, 'artifacts', globalAppId, 'public', 'data', 'quiz_scores');
+            onSnapshot(query(leaderboardRef), (snapshot) => {
+                globalLeaderboardData = [];
+                snapshot.forEach((doc) => {
+                    globalLeaderboardData.push(doc.data());
+                });
+                renderLeaderboard();
+            }, (error) => {
+                console.error("Error listening to leaderboard:", error);
+            });
+        };
+
+        const saveScoreToDatabase = async (scoreData) => {
+            if (db && auth && auth.currentUser) {
+                try {
+                    const leaderboardRef = collection(db, 'artifacts', globalAppId, 'public', 'data', 'quiz_scores');
+                    await addDoc(leaderboardRef, scoreData);
+                } catch(e) {
+                    console.error("Error saving score:", e);
+                }
+            } else {
+                globalLeaderboardData.push(scoreData);
+                renderLeaderboard();
+            }
+        };
+
+        const setupMockLeaderboard = () => {
+            globalLeaderboardData = [
+                { section: "702", seat: "04", name: "Chen (陳)", score: 16, timeUsed: 240 },
+                { section: "704", seat: "12", name: "Lin (林)", score: 15, timeUsed: 310 },
+                { section: "701", seat: "25", name: "Huang (黃)", score: 15, timeUsed: 180 }
+            ];
+        };
+
+        initFirebase();
+
+        /* =========================================
+           4. QUIZ LOGIC
+           ========================================= */
+        const formatTime = (seconds) => {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        };
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            window.quizState.currentUser = {
+                section: document.getElementById('student-section').value,
+                seat: document.getElementById('student-seat').value.padStart(2, '0'),
+                cname: document.getElementById('student-cname').value,
+                ename: document.getElementById('student-ename').value
+            };
+
+            document.getElementById('display-name').textContent = `${window.quizState.currentUser.ename} (${window.quizState.currentUser.cname})`;
+            document.getElementById('display-section').textContent = window.quizState.currentUser.section;
+            document.getElementById('display-seat').textContent = window.quizState.currentUser.seat;
+
+            switchSection('login-section', 'quiz-section');
+
+            // Setup questions
+            window.quizState.shuffledQuestions = [...quizQuestions].sort(() => Math.random() - 0.5);
+            
+            // Start Quiz
+            startTimer();
+            loadQuestion();
+        });
+
+        function switchSection(hideId, showId) {
+            const hideEl = document.getElementById(hideId);
+            const showEl = document.getElementById(showId);
+            hideEl.classList.add('hidden-section');
+            hideEl.classList.remove('fade-in');
+            
+            setTimeout(() => {
+                showEl.classList.remove('hidden-section');
+                showEl.classList.add('fade-in');
+
+                // Toggle floating tools background visibility based on active section
+                if (showId === 'quiz-section') {
+                    document.getElementById('floating-tools').style.opacity = '1';
+                } else {
+                    document.getElementById('floating-tools').style.opacity = '0';
+                }
+            }, 50);
+        }
+
+        function startTimer() {
+            document.getElementById('timer-display').textContent = formatTime(window.quizState.timeRemaining);
+            
+            window.quizState.timerInterval = setInterval(() => {
+                window.quizState.timeRemaining--;
+                document.getElementById('timer-display').textContent = formatTime(window.quizState.timeRemaining);
+                
+                if (window.quizState.timeRemaining <= 60) {
+                    document.getElementById('timer-display').style.color = '#ff00ea';
+                    document.getElementById('timer-display').style.textShadow = '0 0 15px #ff00ea';
+                }
+
+                if (window.quizState.timeRemaining <= 0) {
+                    finishQuiz(); 
+                }
+            }, 1000);
+        }
+
+        function loadQuestion() {
+            const q = window.quizState.shuffledQuestions[window.quizState.currentQuestionIndex];
+            
+            document.getElementById('current-question-num').textContent = window.quizState.currentQuestionIndex + 1;
+            document.getElementById('question-image').src = q.image;
+
+            const progress = ((window.quizState.currentQuestionIndex) / quizQuestions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+
+            // Randomize options order for the 4 options
+            q.shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+            
+            for (let i = 0; i < 4; i++) {
+                document.getElementById(`choice-text-${i}`).textContent = q.shuffledOptions[i];
+            }
+        }
+
+        window.selectAnswer = function(selectedIndex) {
+            const q = window.quizState.shuffledQuestions[window.quizState.currentQuestionIndex];
+            const selectedText = q.shuffledOptions[selectedIndex];
+            
+            if (selectedText === q.correctTool) {
+                window.quizState.score++;
+            }
+
+            window.quizState.currentQuestionIndex++;
+
+            if (window.quizState.currentQuestionIndex < quizQuestions.length) {
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        };
+
+        async function finishQuiz() {
+            clearInterval(window.quizState.timerInterval);
+            switchSection('quiz-section', 'result-section');
+
+            const timeUsed = 600 - window.quizState.timeRemaining;
+            
+            document.getElementById('final-score').textContent = `${window.quizState.score}/${quizQuestions.length}`;
+            document.getElementById('completion-time').textContent = `Time Used: ${formatTime(timeUsed)}`;
+
+            const scoreData = {
+                section: window.quizState.currentUser.section,
+                seat: window.quizState.currentUser.seat,
+                name: window.quizState.currentUser.ename,
+                cname: window.quizState.currentUser.cname,
+                score: window.quizState.score,
+                timeUsed: timeUsed,
+                timestamp: new Date().toISOString()
+            };
+
+            await saveScoreToDatabase(scoreData);
+        }
+
+        function renderLeaderboard() {
+            const sortedData = [...globalLeaderboardData].sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return a.timeUsed - b.timeUsed;
+            });
+
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = '';
+
+            if (sortedData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">No scores yet.</td></tr>';
+                return;
+            }
+
+            const currentUserSeatId = window.quizState.currentUser.seat ? `${window.quizState.currentUser.section}-${window.quizState.currentUser.seat}` : null;
+
+            sortedData.forEach((entry, index) => {
+                const tr = document.createElement('tr');
+                const isCurrent = currentUserSeatId === `${entry.section}-${entry.seat}`;
+                
+                if (isCurrent) {
+                    tr.className = 'bg-cyan-900 bg-opacity-40 border-l-4 border-cyan-400 transition-all';
+                } else {
+                    tr.className = 'hover:bg-slate-800 transition-colors duration-200';
+                }
+
+                let rankStyle = 'text-gray-400';
+                if (index === 0) rankStyle = 'text-yellow-400 font-bold text-shadow-[0_0_10px_#facc15]';
+                else if (index === 1) rankStyle = 'text-gray-300 font-bold text-shadow-[0_0_10px_#cbd5e1]';
+                else if (index === 2) rankStyle = 'text-amber-600 font-bold text-shadow-[0_0_10px_#d97706]';
+
+                tr.innerHTML = `
+                    <td class="p-4 ${rankStyle}">#${index + 1}</td>
+                    <td class="p-4 text-gray-200">${entry.section}</td>
+                    <td class="p-4 text-gray-300">${entry.seat}</td>
+                    <td class="p-4 font-semibold ${isCurrent ? 'text-cyan-300' : 'text-white'}">${entry.name} ${isCurrent ? '<span class="text-xs ml-2 text-cyan-500 bg-cyan-900 px-2 py-1 rounded">(YOU)</span>' : ''}</td>
+                    <td class="p-4 text-right font-mono font-bold text-cyan-100">${entry.score}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
