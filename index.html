@@ -375,14 +375,15 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs for Live Leaderboard & Data Storage -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- Live Leaderboard & Logic Scripts -->
+    <script>
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/library/d/1QaQ6LHsGPgnJvyWunapjArFPZnj64InKQg26c7zsxO4qclOodVPEZk5_/2";
+        
+        let globalLeaderboardData = []; 
+        let liveLeaderboardInterval = null;
 
         /* =========================================
-           1. QUIZ DATA & QUESTIONS (4 Options)
+           1. QUIZ DATA & QUESTIONS (Updated to "Identify Tool")
            ========================================= */
         const quizQuestions = [
             { image: "Images/3D_Printer.png", correctTool: "3D Printer", options: ["Air Compressor", "3D Printer", "Lathe", "Drilling Machine"] },
@@ -414,80 +415,9 @@
             timerInterval: null,
             shuffledQuestions: []
         };
-        
-        let db, auth, globalAppId;
-        let globalLeaderboardData = []; // Store fetched database scores
 
         /* =========================================
-           3. FIREBASE SETUP (For Database Storage)
-           ========================================= */
-        const initFirebase = async () => {
-            try {
-                if (typeof __firebase_config !== 'undefined' && typeof __app_id !== 'undefined') {
-                    const firebaseConfig = JSON.parse(__firebase_config);
-                    const app = initializeApp(firebaseConfig);
-                    auth = getAuth(app);
-                    db = getFirestore(app);
-                    globalAppId = __app_id;
-
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-
-                    onAuthStateChanged(auth, (user) => {
-                        if (user) setupLeaderboardListener();
-                    });
-                } else {
-                    console.warn("Firebase config not found. Running in local mode without cloud saves.");
-                    setupMockLeaderboard();
-                }
-            } catch(e) {
-                console.error("Firebase init error:", e);
-                setupMockLeaderboard();
-            }
-        };
-
-        const setupLeaderboardListener = () => {
-            const leaderboardRef = collection(db, 'artifacts', globalAppId, 'public', 'data', 'quiz_scores');
-            onSnapshot(query(leaderboardRef), (snapshot) => {
-                globalLeaderboardData = [];
-                snapshot.forEach((doc) => {
-                    globalLeaderboardData.push(doc.data());
-                });
-                renderLeaderboard();
-            }, (error) => {
-                console.error("Error listening to leaderboard:", error);
-            });
-        };
-
-        const saveScoreToDatabase = async (scoreData) => {
-            if (db && auth && auth.currentUser) {
-                try {
-                    const leaderboardRef = collection(db, 'artifacts', globalAppId, 'public', 'data', 'quiz_scores');
-                    await addDoc(leaderboardRef, scoreData);
-                } catch(e) {
-                    console.error("Error saving score:", e);
-                }
-            } else {
-                globalLeaderboardData.push(scoreData);
-                renderLeaderboard();
-            }
-        };
-
-        const setupMockLeaderboard = () => {
-            globalLeaderboardData = [
-                { section: "702", seat: "04", name: "Chen (陳)", score: 16, timeUsed: 240 },
-                { section: "704", seat: "12", name: "Lin (林)", score: 15, timeUsed: 310 },
-                { section: "701", seat: "25", name: "Huang (黃)", score: 15, timeUsed: 180 }
-            ];
-        };
-
-        initFirebase();
-
-        /* =========================================
-           4. QUIZ LOGIC
+           3. QUIZ LOGIC
            ========================================= */
         const formatTime = (seconds) => {
             const m = Math.floor(seconds / 60);
@@ -605,44 +535,51 @@
                 name: window.quizState.currentUser.ename,
                 cname: window.quizState.currentUser.cname,
                 score: window.quizState.score,
-                timeUsed: timeUsed,
-                timestamp: new Date().toISOString()
+                timeUsed: timeUsed
             };
-
-            await saveScoreToDatabase(scoreData);
             
-            // --- NEW: Send data to Google Sheets ---
+            // Add student's score locally immediately so they don't have to wait
+            globalLeaderboardData.push(scoreData);
+            renderLeaderboard();
+
+            // Send data to Google Sheets
             sendToGoogleSheets(scoreData);
+
+            // Fetch the overall live leaderboard immediately, then every 5 seconds
+            fetchLiveLeaderboard();
+            liveLeaderboardInterval = setInterval(fetchLiveLeaderboard, 5000);
         }
 
         /* =========================================
-           NEW: GOOGLE SHEETS SYNC FUNCTION
+           4. LIVE GOOGLE SHEETS SYNC
            ========================================= */
         function sendToGoogleSheets(data) {
-            // Web App URL from Google Apps Script
-            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyaYqMWKCW-Ve_TgpFVW10G4WWmbs2EBYstzR3SIjF5yLEKdTJ3pZTWDZtoAZgFOHr7/exec";
-            
-            if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_WEB_APP_URL_HERE") {
-                console.log("Google Sheets link not added yet. Data not sent to sheets.");
-                return;
-            }
-
-            // Send the data in the background
             fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
-                // Using text/plain prevents strict CORS blocking from browsers
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify(data)
             })
-            .then(response => {
-                console.log("Successfully recorded to Google Sheets!");
-            })
-            .catch(error => {
-                console.error("Error sending to Google Sheets:", error);
-            });
+            .then(response => console.log("Score recorded to Google Sheets!"))
+            .catch(error => console.error("Error sending to Google Sheets:", error));
+        }
+
+        async function fetchLiveLeaderboard() {
+            try {
+                // Fetch the live data generated by the doGet function in Apps Script
+                const response = await fetch(GOOGLE_SCRIPT_URL);
+                const data = await response.json();
+                
+                if (!data.error) {
+                    globalLeaderboardData = data;
+                    renderLeaderboard();
+                }
+            } catch (error) {
+                console.error("Error fetching live leaderboard:", error);
+            }
         }
 
         function renderLeaderboard() {
+            // Sort just in case (though Google Script handles it too)
             const sortedData = [...globalLeaderboardData].sort((a, b) => {
                 if (b.score !== a.score) return b.score - a.score;
                 return a.timeUsed - b.timeUsed;
@@ -652,10 +589,11 @@
             tbody.innerHTML = '';
 
             if (sortedData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">No scores yet.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">Loading scores...</td></tr>';
                 return;
             }
 
+            // Identify current user to highlight them
             const currentUserSeatId = window.quizState.currentUser.seat ? `${window.quizState.currentUser.section}-${window.quizState.currentUser.seat}` : null;
 
             sortedData.forEach((entry, index) => {
