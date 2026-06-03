@@ -385,22 +385,22 @@
            1. QUIZ DATA & QUESTIONS (4 Options)
            ========================================= */
         const quizQuestions = [
-            { image: "./images/3D_Printer.png", correctTool: "3D Printer", options: ["Air Compressor", "3D Printer", "Lathe", "Drilling Machine"] },
-            { image: "./images/Air_compressor.png", correctTool: "Air Compressor", options: ["Air Compressor", "Drilling Machine", "Band Saw", "Belt Sander"] },
-            { image: "./images/Band_Saw.png", correctTool: "Band Saw", options: ["Scroll Saw Machine", "Coping Saw", "Band Saw", "Folding Saw"] },
-            { image: "./images/Belt_Sander.png", correctTool: "Belt Sander", options: ["Belt Sander", "Hand Drill", "Lathe", "Scroll Saw Machine"] },
-            { image: "./images/Coping_saw.png", correctTool: "Coping Saw", options: ["Folding Saw", "Coping Saw", "Hammers", "Band Saw"] },
-            { image: "./images/Drilling_Machine.png", correctTool: "Drilling Machine", options: ["Drilling Machine", "Lathe", "Air Compressor", "3D Printer"] },
-            { image: "./images/Folding_saw.png", correctTool: "Folding Saw", options: ["Coping Saw", "Pliers", "Folding Saw", "Band Saw"] },
-            { image: "./images/Hammers.png", correctTool: "Hammers", options: ["Screwdrivers", "Hammers", "Wrenches", "Pliers"] },
-            { image: "./images/Hand_and_Portable_Power_Tools.png", correctTool: "Hand and Portable Power Tools", options: ["Hand and Portable Power Tools", "Rulers", "Pliers", "Hammers"] },
-            { image: "./images/Hand_drill.png", correctTool: "Hand Drill", options: ["Screwdrivers", "Hand Drill", "Belt Sander", "Drilling Machine"] },
-            { image: "./images/Lathe.png", correctTool: "Lathe", options: ["Lathe", "Band Saw", "3D Printer", "Drilling Machine"] },
-            { image: "./images/Pliers.png", correctTool: "Pliers", options: ["Wrenches", "Pliers", "Hammers", "Screwdrivers"] },
-            { image: "./images/Rulers.png", correctTool: "Rulers", options: ["Rulers", "Hand Drill", "Screwdrivers", "Wrenches"] },
-            { image: "./images/Screwdrivers.png", correctTool: "Screwdrivers", options: ["Pliers", "Screwdrivers", "Wrenches", "Hammers"] },
-            { image: "./images/Scroll_Saw_Machine.png", correctTool: "Scroll Saw Machine", options: ["Band Saw", "Coping Saw", "Scroll Saw Machine", "Lathe"] },
-            { image: "./images/Wrenches.png", correctTool: "Wrenches", options: ["Wrenches", "Pliers", "Hammers", "Screwdrivers"] }
+            { image: "Images/3D_Printer.png", correctTool: "3D Printer", options: ["Air Compressor", "3D Printer", "Lathe", "Drilling Machine"] },
+            { image: "Images/Air_compressor.png", correctTool: "Air Compressor", options: ["Air Compressor", "Drilling Machine", "Band Saw", "Belt Sander"] },
+            { image: "Images/Band_Saw.png", correctTool: "Band Saw", options: ["Scroll Saw Machine", "Coping Saw", "Band Saw", "Folding Saw"] },
+            { image: "Images/Belt_Sander.png", correctTool: "Belt Sander", options: ["Belt Sander", "Hand Drill", "Lathe", "Scroll Saw Machine"] },
+            { image: "Images/Coping_saw.png", correctTool: "Coping Saw", options: ["Folding Saw", "Coping Saw", "Hammers", "Band Saw"] },
+            { image: "Images/Drilling_Machine.png", correctTool: "Drilling Machine", options: ["Drilling Machine", "Lathe", "Air Compressor", "3D Printer"] },
+            { image: "Images/Folding_saw.png", correctTool: "Folding Saw", options: ["Coping Saw", "Pliers", "Folding Saw", "Band Saw"] },
+            { image: "Images/Hammers.png", correctTool: "Hammers", options: ["Screwdrivers", "Hammers", "Wrenches", "Pliers"] },
+            { image: "Images/Hand_and_Portable_Power_Tools.png", correctTool: "Hand and Portable Power Tools", options: ["Hand and Portable Power Tools", "Rulers", "Pliers", "Hammers"] },
+            { image: "Images/Hand_drill.png", correctTool: "Hand Drill", options: ["Screwdrivers", "Hand Drill", "Belt Sander", "Drilling Machine"] },
+            { image: "Images/Lathe.png", correctTool: "Lathe", options: ["Lathe", "Band Saw", "3D Printer", "Drilling Machine"] },
+            { image: "Images/Pliers.png", correctTool: "Pliers", options: ["Wrenches", "Pliers", "Hammers", "Screwdrivers"] },
+            { image: "Images/Rulers.png", correctTool: "Rulers", options: ["Rulers", "Hand Drill", "Screwdrivers", "Wrenches"] },
+            { image: "Images/Screwdrivers.png", correctTool: "Screwdrivers", options: ["Pliers", "Screwdrivers", "Wrenches", "Hammers"] },
+            { image: "Images/Scroll_Saw_Machine.png", correctTool: "Scroll Saw Machine", options: ["Band Saw", "Coping Saw", "Scroll Saw Machine", "Lathe"] },
+            { image: "Images/Wrenches.png", correctTool: "Wrenches", options: ["Wrenches", "Pliers", "Hammers", "Screwdrivers"] }
         ];
 
         /* =========================================
@@ -610,6 +610,36 @@
             };
 
             await saveScoreToDatabase(scoreData);
+            
+            // --- NEW: Send data to Google Sheets ---
+            sendToGoogleSheets(scoreData);
+        }
+
+        /* =========================================
+           NEW: GOOGLE SHEETS SYNC FUNCTION
+           ========================================= */
+        function sendToGoogleSheets(data) {
+            // Web App URL from Google Apps Script
+            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyaYqMWKCW-Ve_TgpFVW10G4WWmbs2EBYstzR3SIjF5yLEKdTJ3pZTWDZtoAZgFOHr7/exec";
+            
+            if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_WEB_APP_URL_HERE") {
+                console.log("Google Sheets link not added yet. Data not sent to sheets.");
+                return;
+            }
+
+            // Send the data in the background
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                // Using text/plain prevents strict CORS blocking from browsers
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                console.log("Successfully recorded to Google Sheets!");
+            })
+            .catch(error => {
+                console.error("Error sending to Google Sheets:", error);
+            });
         }
 
         function renderLeaderboard() {
