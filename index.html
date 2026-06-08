@@ -217,8 +217,11 @@
 
     <div class="w-full max-w-4xl glass-panel p-6 md:p-10 fade-in" id="main-container">
         
-        <button onclick="promptTeacherMode()" class="absolute top-4 right-4 text-slate-500 hover:text-cyan-400 transition-colors z-50 p-2" title="Teacher Dashboard">
-            <i class="fa-solid fa-circle-user text-2xl"></i>
+        <!-- HIGH CONTRAST SVG TEACHER ACCESS BUTTON (Guaranteed to render under any firewall/CDN block) -->
+        <button onclick="promptTeacherMode()" class="absolute top-4 right-4 text-cyan-400 hover:text-cyan-200 hover:scale-110 active:scale-90 transition-all z-50 p-2 bg-slate-900 bg-opacity-70 rounded-lg border border-cyan-800 shadow-md flex items-center justify-center" title="Teacher Dashboard" style="box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
         </button>
 
         <div id="login-section">
@@ -226,7 +229,8 @@
                 <div class="inline-block p-3 rounded-full bg-cyan-900 bg-opacity-30 border border-cyan-500 mb-4 animate-pulse">
                     <svg class="w-10 h-10 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                 </div>
-                <h1 class="text-3xl md:text-5xl font-black text-glow mb-2 uppercase tracking-widest">Living Technology</h1>
+                <!-- Added a secret Triple-Click event listener helper on this h1 -->
+                <h1 onclick="handleTitleClick()" class="text-3xl md:text-5xl font-black text-glow mb-2 uppercase tracking-widest cursor-pointer select-none" title="Triple click for teacher login">Living Technology</h1>
                 <h2 class="text-xl md:text-2xl text-glow-alt tracking-wide font-bold">Hand & Power Tools Quiz</h2>
             </div>
 
@@ -269,6 +273,7 @@
             </form>
         </div>
 
+        <!-- ================= QUIZ SECTION ================= -->
         <div id="quiz-section" class="hidden-section">
             <div class="flex justify-between items-center border-b border-cyan-800 pb-4 mb-6">
                 <div class="text-sm md:text-base bg-black bg-opacity-50 px-4 py-2 rounded-lg border border-cyan-900">
@@ -315,6 +320,7 @@
             </div>
         </div>
 
+        <!-- ================= RESULT / LEADERBOARD SECTION ================= -->
         <div id="result-section" class="hidden-section">
             <div class="text-center mb-8">
                 <h2 class="text-4xl md:text-5xl font-black text-glow-alt mb-6 uppercase">Quiz Complete</h2>
@@ -357,6 +363,7 @@
             </div>
         </div>
 
+        <!-- ================= SECRET TEACHER DASHBOARD ================= -->
         <div id="teacher-section" class="hidden-section">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-cyan-800 pb-4 mb-6">
                 <div>
@@ -432,6 +439,8 @@
         let globalLeaderboardData = []; 
         let liveLeaderboardInterval = null;
         let isTeacherModeActive = false;
+        let titleClickCount = 0;
+        let titleClickTimeout = null;
 
         /* =========================================
            1. QUIZ DATA & QUESTIONS 
@@ -693,6 +702,21 @@
                 alert("Incorrect Passcode. Access Denied.");
             }
         }
+
+        // Shortcut: If they click the header title 3 times, trigger Teacher Mode
+        window.handleTitleClick = function() {
+            titleClickCount++;
+            clearTimeout(titleClickTimeout);
+            
+            if (titleClickCount >= 3) {
+                titleClickCount = 0;
+                promptTeacherMode();
+            } else {
+                titleClickTimeout = setTimeout(() => {
+                    titleClickCount = 0;
+                }, 1000);
+            }
+        };
 
         function activateTeacherMode() {
             isTeacherModeActive = true;
