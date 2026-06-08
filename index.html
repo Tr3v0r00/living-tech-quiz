@@ -12,7 +12,7 @@
             --primary-glow: #00e5ff;
             --secondary-glow: #ff00ea;
             --bg-color: #050510;
-            --panel-bg: rgba(10, 15, 30, 0.75);
+            --panel-bg: rgba(10, 15, 30, 0.85);
         }
 
         body {
@@ -63,7 +63,7 @@
             50% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; transform: translateY(-30px) rotate(45deg); }
         }
 
-        /* --- New Floating Tools Background (Quiz) --- */
+        /* --- Floating Tools Background (Quiz) --- */
         #floating-tools {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -112,12 +112,6 @@
             border-radius: 20px;
             position: relative;
             overflow: hidden;
-            animation: float-panel 6s ease-in-out infinite;
-        }
-
-        @keyframes float-panel {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
         }
 
         /* Glowing Texts */
@@ -125,7 +119,7 @@
         .text-glow-alt { text-shadow: 0 0 10px var(--secondary-glow), 0 0 20px var(--secondary-glow); color: #f3e8ff; }
 
         /* Inputs & Buttons */
-        .input-group { position: relative; margin-bottom: 1.5rem; z-index: 30; }
+        .input-group { position: relative; margin-bottom: 1.5rem; z-index: 10; }
         .input-glowing {
             background: rgba(0, 0, 0, 0.6);
             border: 1px solid rgba(0, 229, 255, 0.3);
@@ -180,7 +174,7 @@
             border: 1px dashed rgba(255, 0, 234, 0.4);
             margin: 0 auto 20px auto;
             max-width: 450px;
-            overflow: hidden; /* Added to keep corners clean */
+            overflow: hidden;
         }
         .tool-image {
             width: 100%;
@@ -204,7 +198,6 @@
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
 
-    <!-- Moving Background Designs -->
     <div class="bg-shapes">
         <div class="shape shape-1"></div>
         <div class="shape shape-2"></div>
@@ -212,7 +205,6 @@
         <div class="shape shape-4"></div>
     </div>
 
-    <!-- Floating Tools Background (Only visible during quiz) -->
     <div id="floating-tools" style="opacity: 0;">
         <i class="fa-solid fa-hammer float-tool" style="left: 10%; font-size: 3.5rem; animation-duration: 20s; animation-delay: 0s;"></i>
         <i class="fa-solid fa-wrench float-tool" style="left: 25%; font-size: 2.5rem; animation-duration: 25s; animation-delay: -5s;"></i>
@@ -223,10 +215,12 @@
         <i class="fa-solid fa-wrench float-tool" style="left: 15%; font-size: 3rem; animation-duration: 19s; animation-delay: -8s;"></i>
     </div>
 
-    <!-- MAIN APP CONTAINER -->
     <div class="w-full max-w-4xl glass-panel p-6 md:p-10 fade-in" id="main-container">
         
-        <!-- ================= LOGIN SECTION ================= -->
+        <button onclick="promptTeacherMode()" class="absolute top-4 right-4 text-slate-500 hover:text-cyan-400 transition-colors z-50 p-2" title="Teacher Dashboard">
+            <i class="fa-solid fa-circle-user text-2xl"></i>
+        </button>
+
         <div id="login-section">
             <div class="text-center mb-8">
                 <div class="inline-block p-3 rounded-full bg-cyan-900 bg-opacity-30 border border-cyan-500 mb-4 animate-pulse">
@@ -237,7 +231,6 @@
             </div>
 
             <form id="login-form" class="max-w-md mx-auto relative z-10 bg-black bg-opacity-40 p-6 rounded-xl border border-gray-800 shadow-2xl overflow-hidden">
-                <!-- Login Scanner Animation is HERE now -->
                 <div class="login-scanner"></div>
                 
                 <div class="input-group">
@@ -276,21 +269,17 @@
             </form>
         </div>
 
-        <!-- ================= QUIZ SECTION ================= -->
         <div id="quiz-section" class="hidden-section">
             <div class="flex justify-between items-center border-b border-cyan-800 pb-4 mb-6">
-                <!-- Player Info -->
                 <div class="text-sm md:text-base bg-black bg-opacity-50 px-4 py-2 rounded-lg border border-cyan-900">
                     <span class="text-cyan-400 font-bold">Student:</span> <span id="display-name" class="font-bold">---</span> 
                     <span class="text-gray-400 ml-2">|<span id="display-section" class="ml-2">---</span> - <span id="display-seat">---</span></span>
                 </div>
-                <!-- Timer -->
                 <div class="text-2xl font-mono font-bold text-glow bg-black bg-opacity-50 px-4 py-2 rounded-lg border border-cyan-900" id="timer-display">
                     10:00
                 </div>
             </div>
 
-            <!-- Progress Bar -->
             <div class="w-full bg-slate-900 rounded-full h-3 mb-2 border border-slate-700 relative overflow-hidden">
                 <div id="progress-bar" class="bg-gradient-to-r from-cyan-600 to-cyan-300 h-full rounded-full transition-all duration-500" style="width: 0%; box-shadow: 0 0 15px cyan;"></div>
             </div>
@@ -298,22 +287,18 @@
                 Question <span id="current-question-num">1</span> / 16
             </div>
 
-            <!-- Question Text -->
             <h3 class="text-2xl md:text-3xl text-center mb-6 font-bold text-glow-alt">
                 Identify this tool/machine:
             </h3>
 
-            <!-- Image Area with Futuristic Frame (Scanner removed) -->
             <div class="tool-image-container">
                 <div class="corner-bracket tl"></div>
                 <div class="corner-bracket tr"></div>
                 <div class="corner-bracket bl"></div>
                 <div class="corner-bracket br"></div>
-                <!-- IMPORTANT: Replace src with actual image paths in GitHub later -->
                 <img id="question-image" src="" alt="Tool Image" class="tool-image" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCA0MDAgMjUwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMWExYTFhIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMGU1ZmYiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIj5JbWFnZSBQbGFjZWhvbGRlcjwvdGV4dD48L3N2Zz4=';">
             </div>
 
-            <!-- Multiple Choices (Now a 2x2 Grid for 4 Options) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto" id="choices-container">
                 <button class="w-full text-left p-4 rounded-xl choice-btn text-lg font-semibold flex items-center gap-4" onclick="selectAnswer(0)" id="choice-0">
                     <span class="bg-cyan-900 text-cyan-300 w-8 h-8 flex items-center justify-center rounded-full text-sm shrink-0">A</span> <span id="choice-text-0">Option 1</span>
@@ -330,13 +315,11 @@
             </div>
         </div>
 
-        <!-- ================= RESULT / LEADERBOARD SECTION ================= -->
         <div id="result-section" class="hidden-section">
             <div class="text-center mb-8">
                 <h2 class="text-4xl md:text-5xl font-black text-glow-alt mb-6 uppercase">Quiz Complete</h2>
                 <div class="inline-block bg-black bg-opacity-60 p-8 rounded-3xl border-2 border-cyan-500 shadow-[0_0_40px_rgba(0,229,255,0.3)] relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-full h-full opacity-10" style="background: repeating-linear-gradient(45deg, transparent, transparent 10px, #00e5ff 10px, #00e5ff 20px);"></div>
-                    
                     <p class="text-xl text-cyan-300 mb-2 relative z-10 font-bold uppercase tracking-widest">Final Score</p>
                     <p class="text-7xl font-black text-glow relative z-10 my-4" id="final-score">0/16</p>
                     <p class="text-gray-300 relative z-10 font-mono text-lg" id="completion-time">Time Used: --:--</p>
@@ -345,8 +328,8 @@
 
             <div class="max-w-3xl mx-auto bg-black bg-opacity-40 rounded-xl border border-gray-800 p-4 md:p-8">
                 <h3 class="text-2xl font-bold text-center mb-6 text-glow flex items-center justify-center gap-3">
-                    <svg class="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                    Live Leaderboard
+                    <i class="fa-solid fa-trophy text-yellow-400 animate-bounce"></i>
+                    Live Classroom Leaderboard
                 </h3>
                 
                 <div class="overflow-x-auto rounded-lg border border-slate-700">
@@ -361,7 +344,7 @@
                             </tr>
                         </thead>
                         <tbody id="leaderboard-body" class="divide-y divide-slate-800">
-                            <tr><td colspan="5" class="text-center p-4 text-gray-400">Loading scores...</td></tr>
+                            <tr><td colspan="5" class="text-center p-4 text-gray-400"><i class="fa-solid fa-circle-notch animate-spin mr-2"></i>Loading live results...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -373,17 +356,85 @@
                 </div>
             </div>
         </div>
+
+        <div id="teacher-section" class="hidden-section">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-cyan-800 pb-4 mb-6">
+                <div>
+                    <h2 class="text-3xl font-black text-glow">Teacher Command Center</h2>
+                    <p class="text-sm text-cyan-400">Real-time Class Standing & Monitoring Panel</p>
+                </div>
+                <button onclick="exitTeacherMode()" class="mt-4 md:mt-0 px-6 py-2 border border-red-500 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors font-bold uppercase tracking-wider text-xs">
+                    Exit Monitor Mode
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-slate-900 bg-opacity-60 border border-slate-800 p-4 rounded-xl text-center">
+                    <div class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Total Submissions</div>
+                    <div class="text-3xl font-bold text-glow" id="stat-total-submissions">0</div>
+                </div>
+                <div class="bg-slate-900 bg-opacity-60 border border-slate-800 p-4 rounded-xl text-center">
+                    <div class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Classroom Average</div>
+                    <div class="text-3xl font-bold text-glow-alt" id="stat-class-average">0.0</div>
+                </div>
+                <div class="bg-slate-900 bg-opacity-60 border border-slate-800 p-4 rounded-xl text-center">
+                    <div class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Highest Score</div>
+                    <div class="text-3xl font-bold text-green-400 text-shadow-[0_0_10px_rgba(74,222,128,0.4)]" id="stat-highest-score">0/16</div>
+                </div>
+                <div class="bg-slate-900 bg-opacity-60 border border-slate-800 p-4 rounded-xl text-center">
+                    <div class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Fastest 16/16</div>
+                    <div class="text-3xl font-bold text-cyan-400" id="stat-fastest-time">--:--</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-4 mb-6">
+                <div class="flex-1">
+                    <input type="text" id="teacher-search" placeholder="Search by name, seat, or class..." oninput="filterTeacherData()" class="w-full p-3 rounded-lg input-glowing">
+                </div>
+                <div class="w-full md:w-48">
+                    <select id="teacher-filter-section" onchange="filterTeacherData()" class="w-full p-3 rounded-lg input-glowing">
+                        <option value="ALL">All Sections</option>
+                        <option value="701">Section 701</option>
+                        <option value="702">Section 702</option>
+                        <option value="703">Section 703</option>
+                        <option value="704">Section 704</option>
+                        <option value="705">Section 705</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-lg border border-slate-800">
+                <table class="w-full text-left border-collapse bg-slate-900 bg-opacity-70">
+                    <thead>
+                        <tr class="bg-slate-800 text-cyan-400 border-b border-cyan-800">
+                            <th class="p-4 font-bold text-sm">Timestamp</th>
+                            <th class="p-4 font-bold text-sm">Class</th>
+                            <th class="p-4 font-bold text-sm">Seat</th>
+                            <th class="p-4 font-bold text-sm">English Name</th>
+                            <th class="p-4 font-bold text-sm">Chinese Name</th>
+                            <th class="p-4 font-bold text-sm text-center">Score (Correct)</th>
+                            <th class="p-4 font-bold text-sm text-right">Time Spent</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teacher-table-body" class="divide-y divide-slate-800 text-sm">
+                        <tr><td colspan="7" class="text-center p-6 text-gray-400">Awaiting data retrieval...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Live Leaderboard & Logic Scripts -->
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/library/d/1QaQ6LHsGPgnJvyWunapjArFPZnj64InKQg26c7zsxO4qclOodVPEZk5_/2";
+        // LIVE API INTERFACE URL
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8lCVJYUT-lrDFKaJ8Udf1bpx4e9vA8hR6V_xzNFlwU0-E4IVXjzKvA8L08xCZnpdd/exec";
         
         let globalLeaderboardData = []; 
         let liveLeaderboardInterval = null;
+        let isTeacherModeActive = false;
 
         /* =========================================
-           1. QUIZ DATA & QUESTIONS (Updated to "Identify Tool")
+           1. QUIZ DATA & QUESTIONS 
            ========================================= */
         const quizQuestions = [
             { image: "Images/3D_Printer.png", correctTool: "3D Printer", options: ["Air Compressor", "3D Printer", "Lathe", "Drilling Machine"] },
@@ -417,7 +468,7 @@
         };
 
         /* =========================================
-           3. QUIZ LOGIC
+           3. QUIZ SYSTEM LOGIC
            ========================================= */
         const formatTime = (seconds) => {
             const m = Math.floor(seconds / 60);
@@ -441,10 +492,9 @@
 
             switchSection('login-section', 'quiz-section');
 
-            // Setup questions
+            // Shuffle questions
             window.quizState.shuffledQuestions = [...quizQuestions].sort(() => Math.random() - 0.5);
             
-            // Start Quiz
             startTimer();
             loadQuestion();
         });
@@ -459,7 +509,7 @@
                 showEl.classList.remove('hidden-section');
                 showEl.classList.add('fade-in');
 
-                // Toggle floating tools background visibility based on active section
+                // Toggle floating background tools when in quiz view
                 if (showId === 'quiz-section') {
                     document.getElementById('floating-tools').style.opacity = '1';
                 } else {
@@ -495,7 +545,6 @@
             const progress = ((window.quizState.currentQuestionIndex) / quizQuestions.length) * 100;
             document.getElementById('progress-bar').style.width = `${progress}%`;
 
-            // Randomize options order for the 4 options
             q.shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
             
             for (let i = 0; i < 4; i++) {
@@ -538,20 +587,20 @@
                 timeUsed: timeUsed
             };
             
-            // Add student's score locally immediately so they don't have to wait
+            // Show immediate on-screen local progress right away before network returns
             globalLeaderboardData.push(scoreData);
             renderLeaderboard();
 
-            // Send data to Google Sheets
+            // Submit to Google Sheets (POST request)
             sendToGoogleSheets(scoreData);
 
-            // Fetch the overall live leaderboard immediately, then every 5 seconds
+            // Fetch latest real-time leaderboard, then repeat every 5 seconds
             fetchLiveLeaderboard();
             liveLeaderboardInterval = setInterval(fetchLiveLeaderboard, 5000);
         }
 
         /* =========================================
-           4. LIVE GOOGLE SHEETS SYNC
+           4. GOOGLE SPREADSHEET API & SYNC (POST & GET)
            ========================================= */
         function sendToGoogleSheets(data) {
             fetch(GOOGLE_SCRIPT_URL, {
@@ -559,27 +608,36 @@
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify(data)
             })
-            .then(response => console.log("Score recorded to Google Sheets!"))
-            .catch(error => console.error("Error sending to Google Sheets:", error));
+            .then(res => res.json())
+            .then(response => {
+                if(response.status === "success") {
+                    console.log("Success! Saved cleanly to Sheets.");
+                } else {
+                    console.error("Sheets Error:", response.message);
+                }
+            })
+            .catch(error => console.error("Sheets Network Error:", error));
         }
 
         async function fetchLiveLeaderboard() {
             try {
-                // Fetch the live data generated by the doGet function in Apps Script
                 const response = await fetch(GOOGLE_SCRIPT_URL);
                 const data = await response.json();
                 
                 if (!data.error) {
                     globalLeaderboardData = data;
-                    renderLeaderboard();
+                    if (isTeacherModeActive) {
+                        renderTeacherDashboard();
+                    } else {
+                        renderLeaderboard();
+                    }
                 }
             } catch (error) {
-                console.error("Error fetching live leaderboard:", error);
+                console.error("Failed to update rankings:", error);
             }
         }
 
         function renderLeaderboard() {
-            // Sort just in case (though Google Script handles it too)
             const sortedData = [...globalLeaderboardData].sort((a, b) => {
                 if (b.score !== a.score) return b.score - a.score;
                 return a.timeUsed - b.timeUsed;
@@ -589,21 +647,23 @@
             tbody.innerHTML = '';
 
             if (sortedData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">Loading scores...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400"><i class="fa-solid fa-sync animate-spin mr-2"></i>Waiting for first result...</td></tr>';
                 return;
             }
 
-            // Identify current user to highlight them
             const currentUserSeatId = window.quizState.currentUser.seat ? `${window.quizState.currentUser.section}-${window.quizState.currentUser.seat}` : null;
 
-            sortedData.forEach((entry, index) => {
+            // Display Top 15 on student leaderboard to keep it focused
+            const displayList = sortedData.slice(0, 15);
+
+            displayList.forEach((entry, index) => {
                 const tr = document.createElement('tr');
                 const isCurrent = currentUserSeatId === `${entry.section}-${entry.seat}`;
                 
                 if (isCurrent) {
-                    tr.className = 'bg-cyan-900 bg-opacity-40 border-l-4 border-cyan-400 transition-all';
+                    tr.className = 'bg-cyan-950 bg-opacity-60 border-l-4 border-cyan-400';
                 } else {
-                    tr.className = 'hover:bg-slate-800 transition-colors duration-200';
+                    tr.className = 'hover:bg-slate-800 transition-colors duration-150';
                 }
 
                 let rankStyle = 'text-gray-400';
@@ -615,8 +675,121 @@
                     <td class="p-4 ${rankStyle}">#${index + 1}</td>
                     <td class="p-4 text-gray-200">${entry.section}</td>
                     <td class="p-4 text-gray-300">${entry.seat}</td>
-                    <td class="p-4 font-semibold ${isCurrent ? 'text-cyan-300' : 'text-white'}">${entry.name} ${isCurrent ? '<span class="text-xs ml-2 text-cyan-500 bg-cyan-900 px-2 py-1 rounded">(YOU)</span>' : ''}</td>
-                    <td class="p-4 text-right font-mono font-bold text-cyan-100">${entry.score}</td>
+                    <td class="p-4 font-semibold ${isCurrent ? 'text-cyan-300' : 'text-white'}">${entry.name} ${isCurrent ? '<span class="text-xs ml-2 text-cyan-500 bg-cyan-900 px-2 py-1 rounded">YOU</span>' : ''}</td>
+                    <td class="p-4 text-right font-mono font-bold text-cyan-100">${entry.score} / 16</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        /* =========================================
+           5. SECRET TEACHER COMMAND PANEL
+           ========================================= */
+        function promptTeacherMode() {
+            const password = prompt("Enter Teacher Command Center Passcode:");
+            if (password === "teacher777" || password === "admin") {
+                activateTeacherMode();
+            } else if (password !== null) {
+                alert("Incorrect Passcode. Access Denied.");
+            }
+        }
+
+        function activateTeacherMode() {
+            isTeacherModeActive = true;
+            
+            // Hide everything except teacher view
+            document.getElementById('login-section').classList.add('hidden-section');
+            document.getElementById('quiz-section').classList.add('hidden-section');
+            document.getElementById('result-section').classList.add('hidden-section');
+            document.getElementById('teacher-section').classList.remove('hidden-section');
+            document.getElementById('teacher-section').classList.add('fade-in');
+
+            // Begin real-time updates every 3 seconds for the teacher panel
+            fetchLiveLeaderboard();
+            clearInterval(liveLeaderboardInterval);
+            liveLeaderboardInterval = setInterval(fetchLiveLeaderboard, 3000);
+        }
+
+        function exitTeacherMode() {
+            isTeacherModeActive = false;
+            clearInterval(liveLeaderboardInterval);
+            
+            document.getElementById('teacher-section').classList.add('hidden-section');
+            document.getElementById('login-section').classList.remove('hidden-section');
+            document.getElementById('login-section').classList.add('fade-in');
+        }
+
+        function renderTeacherDashboard() {
+            const data = globalLeaderboardData;
+            
+            // Update Core Stats
+            const total = data.length;
+            document.getElementById('stat-total-submissions').textContent = total;
+
+            if (total > 0) {
+                const avg = (data.reduce((acc, row) => acc + row.score, 0) / total).toFixed(1);
+                document.getElementById('stat-class-average').textContent = avg;
+
+                const maxScore = Math.max(...data.map(r => r.score));
+                document.getElementById('stat-highest-score').textContent = `${maxScore}/16`;
+
+                // Find the fastest perfect scorer
+                const perfectScores = data.filter(r => r.score === 16);
+                if (perfectScores.length > 0) {
+                    const fastestSecs = Math.min(...perfectScores.map(r => r.timeUsed));
+                    document.getElementById('stat-fastest-time').textContent = formatTime(fastestSecs);
+                } else {
+                    document.getElementById('stat-fastest-time').textContent = "None yet";
+                }
+            } else {
+                document.getElementById('stat-class-average').textContent = "0.0";
+                document.getElementById('stat-highest-score').textContent = "0/16";
+                document.getElementById('stat-fastest-time').textContent = "--:--";
+            }
+
+            filterTeacherData();
+        }
+
+        function filterTeacherData() {
+            const searchVal = document.getElementById('teacher-search').value.toLowerCase();
+            const sectionVal = document.getElementById('teacher-filter-section').value;
+            const tbody = document.getElementById('teacher-table-body');
+            
+            tbody.innerHTML = '';
+            
+            const filtered = globalLeaderboardData.filter(entry => {
+                const matchesSection = (sectionVal === "ALL" || entry.section === sectionVal);
+                const matchesSearch = (
+                    entry.name.toLowerCase().includes(searchVal) ||
+                    entry.cname.toLowerCase().includes(searchVal) ||
+                    entry.seat.includes(searchVal) ||
+                    entry.section.includes(searchVal)
+                );
+                return matchesSection && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center p-6 text-gray-500">No matching student results found.</td></tr>';
+                return;
+            }
+
+            filtered.forEach(entry => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800 border-b border-slate-800 transition-colors';
+                
+                // Score color highlighting
+                let scoreColor = 'text-red-400';
+                if (entry.score >= 14) scoreColor = 'text-green-400 font-bold';
+                else if (entry.score >= 10) scoreColor = 'text-yellow-400';
+
+                tr.innerHTML = `
+                    <td class="p-4 text-xs text-gray-400 font-mono">${entry.dateString || 'Just now'}</td>
+                    <td class="p-4 font-bold text-cyan-400">${entry.section}</td>
+                    <td class="p-4 text-gray-300 font-mono">${entry.seat}</td>
+                    <td class="p-4 font-semibold text-white">${entry.name}</td>
+                    <td class="p-4 text-gray-300">${entry.cname}</td>
+                    <td class="p-4 text-center font-mono ${scoreColor}">${entry.score} / 16</td>
+                    <td class="p-4 text-right font-mono text-cyan-100">${formatTime(entry.timeUsed)}</td>
                 `;
                 tbody.appendChild(tr);
             });
